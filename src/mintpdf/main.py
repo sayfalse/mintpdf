@@ -18,6 +18,15 @@ def main() -> None:
     Handles startup sequence, setup check, configuration loading,
     font initialization, and CLI invocation.
     """
+    # Fix console encoding on Windows to prevent UnicodeEncodeError crashes
+    if sys.platform.startswith("win"):
+        if hasattr(sys.stdout, "reconfigure"):
+            try:
+                sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
+                sys.stderr.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
+            except Exception:
+                pass
+
     try:
         logger.info("Application starting up...")
         clear_screen()
