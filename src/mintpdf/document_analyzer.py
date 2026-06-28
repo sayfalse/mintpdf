@@ -5,12 +5,13 @@ and recommends document styling templates, themes, fonts, and filenames.
 """
 
 import re
-from typing import Dict, Any, List, Optional
 from pathlib import Path
-from .logger import logger
+from typing import Any, Dict, Optional
+
 
 class AnalysisResult:
     """Stores the structural statistics and layout recommendations for an analyzed document."""
+
     def __init__(self):
         self.title: str = "Untitled"
         self.headings_count: int = 0
@@ -24,7 +25,7 @@ class AnalysisResult:
         self.references_count: int = 0
         self.footnotes_count: int = 0
         self.estimated_pages: int = 1
-        
+
         # Recommendations
         self.recommended_template: str = "Standard"
         self.recommended_theme: str = "Professional"
@@ -51,8 +52,9 @@ class AnalysisResult:
             "recommended_theme": self.recommended_theme,
             "recommended_font": self.recommended_font,
             "recommended_filename": self.recommended_filename,
-            "document_type": self.document_type
+            "document_type": self.document_type,
         }
+
 
 class DocumentAnalyzer:
     """Analyzes raw text/markdown to extract structure and propose style settings."""
@@ -71,23 +73,23 @@ class DocumentAnalyzer:
     def analyze(cls, text: str, original_filename: Optional[str] = None) -> AnalysisResult:
         """
         Runs rule-based detection on plain text/markdown.
-        
+
         Args:
             text: Raw string content of the document.
             original_filename: The name of the imported file if loaded from disk.
-            
+
         Returns:
             An AnalysisResult object containing counts and styling recommendations.
         """
         result = AnalysisResult()
-        
+
         if not text.strip():
             return result
-            
+
         lines = text.splitlines()
         in_code_block = False
         in_table = False
-        
+
         # Regex patterns
         h1_pattern = re.compile(r"^#\s+(.+)$")
         h2_pattern = re.compile(r"^##\s+(.+)$|^###\s+(.+)$")
@@ -97,36 +99,40 @@ class DocumentAnalyzer:
         image_pattern = re.compile(r"!\[(.*?)\]\((.*?)\)")
         reference_pattern = re.compile(r"^\[\d+\]\s+(.+)$|^References|^Bibliography", re.IGNORECASE)
         footnote_pattern = re.compile(r"^\[\^\w+\]:?\s+(.+)$")
-        
+
         # Additional tokens count for heuristic matrix
         inline_code_occurrences = 0
         citation_matches = 0
         dialogue_occurrences = 0
         total_words = 0
-        
+
         total_lines = len(lines)
         i = 0
-        
+
         while i < total_lines:
             line = lines[i]
             line_stripped = line.strip()
-            
+
             if not line_stripped:
                 i += 1
                 continue
-                
+
             total_words += len(line_stripped.split())
-            
+
             # Inline code search
             inline_code_occurrences += len(re.findall(r"`.*?`", line_stripped))
-            
+
             # Academic brackets citations [12] or (Author, 2024)
             citation_matches += len(re.findall(r"\[\d+\]|\([A-Za-z]+,\s*\d{4}\)", line_stripped))
-            
+
             # Dialogue occurrences (creative quotes or em-dash lists)
-            if line_stripped.startswith('"') or line_stripped.startswith('“') or line_stripped.startswith('—'):
+            if (
+                line_stripped.startswith('"')
+                or line_stripped.startswith("“")
+                or line_stripped.startswith("—")
+            ):
                 dialogue_occurrences += 1
-            
+
             # 1. Code block detection
             if line_stripped.startswith("```"):
                 in_code_block = not in_code_block
@@ -134,16 +140,16 @@ class DocumentAnalyzer:
                     result.code_blocks_count += 1
                 i += 1
                 continue
-                
+
             if in_code_block:
                 i += 1
                 continue
-                
+
             # 2. Image detection (within line)
             images_found = image_pattern.findall(line_stripped)
             if images_found:
                 result.images_count += len(images_found)
-                
+
             # 3. Table detection
             if table_pattern.match(line_stripped):
                 if not in_table:
@@ -156,17 +162,17 @@ class DocumentAnalyzer:
 
             # 4. Setext Headings check (Underlines of === or ---)
             if i + 1 < total_lines:
-                next_line_stripped = lines[i+1].strip()
+                next_line_stripped = lines[i + 1].strip()
                 if len(next_line_stripped) >= 3:
                     if all(char == "=" for char in next_line_stripped):
                         result.headings_count += 1
                         if result.title == "Untitled":
                             result.title = line_stripped
-                        i += 2 # skip heading underline
+                        i += 2  # skip heading underline
                         continue
                     elif all(char == "-" for char in next_line_stripped):
                         result.subheadings_count += 1
-                        i += 2 # skip subheading underline
+                        i += 2  # skip subheading underline
                         continue
 
             # 5. ATX Heading 1 / Title detection
@@ -177,7 +183,7 @@ class DocumentAnalyzer:
                     result.title = h1_match.group(1).strip()
                 i += 1
                 continue
-                
+
             # 6. ATX Heading 2/3 / Subheading detection
             h2_match = h2_pattern.match(line_stripped)
             if h2_match:
@@ -222,19 +228,25 @@ class DocumentAnalyzer:
             result.estimated_pages += int(result.headings_count / 8)
 
         # Heuristic Scoring Matrix
-        technical_score = (result.code_blocks_count * 5) + (inline_code_occurrences * 2) + (result.lists_count * 0.5)
-        academic_score = (result.references_count * 5) + (result.footnotes_count * 5) + (citation_matches * 2)
+        technical_score = (
+            (result.code_blocks_count * 5)
+            + (inline_code_occurrences * 2)
+            + (result.lists_count * 0.5)
+        )
+        academic_score = (
+            (result.references_count * 5) + (result.footnotes_count * 5) + (citation_matches * 2)
+        )
         creative_score = (result.quotes_count * 4) + (dialogue_occurrences * 0.5)
-        datasheet_score = (result.tables_count * 8)
-        
+        datasheet_score = result.tables_count * 8
+
         scores = {
             "Technical Documentation": technical_score,
             "Academic Paper": academic_score,
             "Creative Novel / Story": creative_score,
             "Data Sheet / Report": datasheet_score,
-            "Standard Document": 1.0 # Baseline score
+            "Standard Document": 1.0,  # Baseline score
         }
-        
+
         # Determine highest scoring document type
         best_type = max(scores, key=lambda k: scores[k])
         # If max score is 0, fall back to Standard Document

@@ -1,23 +1,12 @@
-import json
-from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from mintpdf.settings import AppSettings, ThemeEnum, FontEnum, PageSizeEnum, MarginsSettings
-from mintpdf.config import (
-    load_config,
-    save_config,
-    is_first_launch,
-    get_default_output_dir
-)
+from mintpdf.settings import AppSettings, FontEnum, MarginsSettings, PageSizeEnum, ThemeEnum
+
 
 def test_settings_validation():
     # Valid initializations
-    s = AppSettings(
-        theme="Professional",
-        default_font="Helvetica",
-        page_size="LETTER"
-    )
+    s = AppSettings(theme="Professional", default_font="Helvetica", page_size="LETTER")
     assert s.theme == ThemeEnum.PROFESSIONAL
     assert s.default_font == FontEnum.HELVETICA
     assert s.page_size == PageSizeEnum.LETTER
@@ -32,6 +21,7 @@ def test_settings_validation():
     with pytest.raises(ValidationError):
         MarginsSettings(top=-10.0)
 
+
 def test_from_dict_with_defaults():
     # Empty dictionary should return defaults
     s = AppSettings.from_dict_with_defaults({})
@@ -42,10 +32,10 @@ def test_from_dict_with_defaults():
     data = {
         "theme": "INVALID_THEME",
         "default_font": "lato",
-        "margins": {"left": -20.0, "top": 40.0} # invalid left margin
+        "margins": {"left": -20.0, "top": 40.0},  # invalid left margin
     }
     s2 = AppSettings.from_dict_with_defaults(data)
-    assert s2.theme == ThemeEnum.PROFESSIONAL # fell back to default
-    assert s2.default_font == FontEnum.LATO # resolved case-insensitively
-    assert s2.margins.left == 54.0 # fell back to default due to invalid value
-    assert s2.margins.top == 40.0 # successfully merged
+    assert s2.theme == ThemeEnum.PROFESSIONAL  # fell back to default
+    assert s2.default_font == FontEnum.LATO  # resolved case-insensitively
+    assert s2.margins.left == 54.0  # fell back to default due to invalid value
+    assert s2.margins.top == 40.0  # successfully merged

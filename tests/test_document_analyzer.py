@@ -1,5 +1,5 @@
-import pytest
 from mintpdf.document_analyzer import DocumentAnalyzer
+
 
 def test_document_analyzer_atx():
     text = """# Main Document Title
@@ -16,6 +16,7 @@ More info about this section.
     assert result.paragraphs_count == 1
     assert result.recommended_filename == "main_document_title.pdf"
 
+
 def test_document_analyzer_setext():
     text = """Setext Title Underline
 ======================
@@ -29,6 +30,7 @@ Some paragraph content.
     assert result.headings_count == 1
     assert result.subheadings_count == 1
     assert result.recommended_filename == "setext_title_underline.pdf"
+
 
 def test_document_analyzer_classification():
     technical_doc = """# Technical Spec

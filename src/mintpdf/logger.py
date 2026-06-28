@@ -4,17 +4,17 @@ Provides rotating file logs, split level routing, and clean, traceback-masked co
 """
 
 import logging
-import os
 import sys
-from pathlib import Path
 from logging.handlers import RotatingFileHandler
+from pathlib import Path
 from typing import Optional
 
 # Default log settings
 LOG_DIR = Path("logs")
 LOG_FILE = LOG_DIR / "mint_pdf.log"
-MAX_BYTES = 5 * 1024 * 1024 # 5 MB
-BACKUP_COUNT = 5            # Keep up to 5 history logs
+MAX_BYTES = 5 * 1024 * 1024  # 5 MB
+BACKUP_COUNT = 5  # Keep up to 5 history logs
+
 
 def setup_logger(name: str = "mint_pdf", level: int = logging.DEBUG) -> logging.Logger:
     """
@@ -23,11 +23,11 @@ def setup_logger(name: str = "mint_pdf", level: int = logging.DEBUG) -> logging.
     """
     logger = logging.getLogger(name)
     logger.setLevel(level)
-    
+
     # Avoid duplicate handlers if setup is called multiple times
     if logger.handlers:
         return logger
-        
+
     # Ensure log directory exists
     try:
         LOG_DIR.mkdir(parents=True, exist_ok=True)
@@ -41,7 +41,7 @@ def setup_logger(name: str = "mint_pdf", level: int = logging.DEBUG) -> logging.
     file_formatter = logging.Formatter(
         "[%(asctime)s] [%(levelname)-8s] [%(name)s] [%(filename)s:%(lineno)d]: %(message)s"
     )
-    
+
     # Rotating File Handler (captures all logs from DEBUG to CRITICAL)
     try:
         file_handler = RotatingFileHandler(
@@ -62,11 +62,14 @@ def setup_logger(name: str = "mint_pdf", level: int = logging.DEBUG) -> logging.
 
     return logger
 
-def log_exception(e: Exception, user_msg: str, logger_instance: Optional[logging.Logger] = None) -> None:
+
+def log_exception(
+    e: Exception, user_msg: str, logger_instance: Optional[logging.Logger] = None
+) -> None:
     """
-    Logs a full stack trace to the log file for developers, 
+    Logs a full stack trace to the log file for developers,
     but prints only a clean, user-friendly message to the console.
-    
+
     Args:
         e: The caught exception.
         user_msg: A friendly, easy-to-understand description of what went wrong.
@@ -75,6 +78,7 @@ def log_exception(e: Exception, user_msg: str, logger_instance: Optional[logging
     log = logger_instance or logger
     # Log the full traceback to file
     log.error(f"{user_msg} | System Error: {e}", exc_info=True)
+
 
 # Initialize global logger
 logger = setup_logger()

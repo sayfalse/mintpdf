@@ -3,9 +3,11 @@ Settings and configuration schemas for Mint PDF.
 Uses Pydantic for validation, structured parsing, and default merging.
 """
 
-from typing import Dict, Any, Union
-from pydantic import BaseModel, Field, field_validator
 from enum import Enum
+from typing import Any, Dict
+
+from pydantic import BaseModel, Field, field_validator
+
 
 class PageSizeEnum(str, Enum):
     LETTER = "LETTER"
@@ -13,6 +15,7 @@ class PageSizeEnum(str, Enum):
     LEGAL = "LEGAL"
     A3 = "A3"
     A5 = "A5"
+
 
 class ThemeEnum(str, Enum):
     BLUE = "Blue"
@@ -26,6 +29,7 @@ class ThemeEnum(str, Enum):
     PROFESSIONAL = "Professional"
     MINIMAL = "Minimal"
 
+
 class FontEnum(str, Enum):
     TIMES_NEW_ROMAN = "Times New Roman"
     ARIAL = "Arial"
@@ -38,8 +42,10 @@ class FontEnum(str, Enum):
     LATO = "Lato"
     INTER = "Inter"
 
+
 class MarginsSettings(BaseModel):
     """Document margin settings in points (1 inch = 72 points)."""
+
     top: float = Field(default=54.0, description="Top margin in points")
     bottom: float = Field(default=54.0, description="Bottom margin in points")
     left: float = Field(default=54.0, description="Left margin in points")
@@ -55,47 +61,37 @@ class MarginsSettings(BaseModel):
             raise ValueError("Margin is too large (maximum 500 points).")
         return value
 
+
 class AppSettings(BaseModel):
     """Core settings schema for the Mint PDF application."""
+
     config_version: int = Field(
-        default=1,
-        description="Configuration schema version for automatic migrations."
+        default=1, description="Configuration schema version for automatic migrations."
     )
     output_dir: str = Field(
-        default="",
-        description="Path to the directory where generated PDFs are saved."
+        default="", description="Path to the directory where generated PDFs are saved."
     )
     theme: ThemeEnum = Field(
-        default=ThemeEnum.PROFESSIONAL,
-        description="Default visual theme for documents."
+        default=ThemeEnum.PROFESSIONAL, description="Default visual theme for documents."
     )
-    default_template: str = Field(
-        default="Standard",
-        description="Default layout template."
-    )
+    default_template: str = Field(default="Standard", description="Default layout template.")
     default_font: FontEnum = Field(
-        default=FontEnum.HELVETICA,
-        description="Default document font family."
+        default=FontEnum.HELVETICA, description="Default document font family."
     )
     page_size: PageSizeEnum = Field(
-        default=PageSizeEnum.LETTER,
-        description="Standard page dimensions."
+        default=PageSizeEnum.LETTER, description="Standard page dimensions."
     )
     margins: MarginsSettings = Field(
-        default_factory=MarginsSettings,
-        description="Page margin configuration."
+        default_factory=MarginsSettings, description="Page margin configuration."
     )
     language: str = Field(
-        default="English",
-        description="Default interface and hyphenation language."
+        default="English", description="Default interface and hyphenation language."
     )
     auto_toc: bool = Field(
-        default=True,
-        description="If True, automatically build and insert a Table of Contents."
+        default=True, description="If True, automatically build and insert a Table of Contents."
     )
     auto_page_numbers: bool = Field(
-        default=True,
-        description="If True, print page numbers in the footer."
+        default=True, description="If True, print page numbers in the footer."
     )
 
     @field_validator("theme", mode="before")
@@ -153,15 +149,16 @@ class AppSettings(BaseModel):
         """
         # Start with default dictionary
         defaults = cls().model_dump()
-        
+
         # Merge values
-        merged = {}
+        merged: Dict[str, Any] = {}
         for key, default_val in defaults.items():
             if key in data:
                 # Merge sub-dictionary (margins)
                 if isinstance(default_val, dict) and isinstance(data[key], dict):
                     sub_merged = {**default_val}
                     from pydantic import ValidationError
+
                     for sub_key, sub_default in default_val.items():
                         if sub_key in data[key]:
                             try:
@@ -171,7 +168,7 @@ class AppSettings(BaseModel):
                                 MarginsSettings(**test_dict)
                                 sub_merged[sub_key] = casted
                             except (ValidationError, ValueError, TypeError):
-                                pass # Keep default
+                                pass  # Keep default
                     merged[key] = sub_merged
                 else:
                     # Check for enum value compatibility

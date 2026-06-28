@@ -25,3 +25,9 @@ src/mintpdf.egg-info/dependency_links.txt
 src/mintpdf.egg-info/entry_points.txt
 src/mintpdf.egg-info/requires.txt
 src/mintpdf.egg-info/top_level.txt
+tests/test_config.py
+tests/test_document_analyzer.py
+tests/test_formatter.py
+tests/test_pdf_engine.py
+tests/test_templates_themes.py
+tests/test_utils.py

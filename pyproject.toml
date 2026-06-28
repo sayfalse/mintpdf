@@ -35,6 +35,33 @@ dependencies = [
 test = [
     "pytest>=8.0.0"
 ]
+lint = [
+    "black>=24.0.0",
+    "ruff>=0.2.0",
+    "mypy>=1.8.0"
+]
+
+[tool.black]
+line-length = 100
+target-version = ['py312']
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "I"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+plugins = [
+    "pydantic.mypy"
+]
+
 
 [project.urls]
 Homepage = "https://github.com/sayfalse/mintpdf"
