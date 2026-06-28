@@ -1,0 +1,17 @@
+# Python pycache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Application Generated Folders
+logs/
+output/
+config.json
+config.json.corrupted_*
+
+# System / Agent specific configs
+.gemini/
+.system_generated/
+.agents/
+.git/
