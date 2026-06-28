@@ -1,72 +1,62 @@
-# Mint PDF
+<div align="center">
+  <br />
+  <h1>🌿 Mint PDF</h1>
+  <p><b>AI-Free Professional PDF Generator for the Terminal</b></p>
 
-🌿 **AI-Free Professional PDF Generator for the Terminal**
+  [![Version](https://img.shields.io/badge/version-1.0.0-48BB78.svg?style=flat-square)](#)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-48BB78.svg?style=flat-square)](LICENSE)
+  [![Platform](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-48BB78.svg?style=flat-square)](#)
+  [![Offline First](https://img.shields.io/badge/offline-100%25-38A169.svg?style=flat-square)](#)
 
-Mint PDF is a production-quality offline CLI application that parses plain text and markdown documents and compiles them into beautifully formatted, publication-ready PDF files.
+  <p><i>A modern command-line application that parses plain text or markdown documents and compiles them into beautifully formatted, publication-ready PDF files. Works 100% locally.</i></p>
+  
+  ---
+</div>
+
+## 🟢 Features
+- **100% Offline-First**: Does not call any cloud APIs, external AI models, or require internet connectivity.
+- **Rules-Based Structural Analyzer**: Scans and parses document elements (lists, tables, quotes, code blocks) to recommend optimal design combinations.
+- **Case-Insensitive Input Validators**: Hardened configuration and prompt validators to resolve choice variations automatically.
+- **Dynamic Themes**: Loads custom JSON color palettes from the workspace `themes/` directory.
+- **Template Inheritance**: Resolves nested layout styles with recursive parent class extends (`"extends": "<ParentTemplate>"`).
+- **Dot-Leader Tables of Contents**: Generates multi-level, aligned document outlines.
+- **Cell-Wrapping Tables**: Automatically wraps column cells in flowable paragraphs to prevent overflow off page margins.
+- **Clean CLI UI**: Styled with Rich columns, panels, pre-generation check tables, and dynamic progress bars.
 
 ---
 
-## Table of Contents
-1. [Project Overview](#project-overview)
-2. [Project Structure](#project-structure)
-3. [Installation Guide](#installation-guide)
-4. [Usage Guide](#usage-guide)
-5. [Configuration Guide](#configuration-guide)
-6. [Template & Theme Guide](#template--theme-guide)
-7. [Developer Guide](#developer-guide)
-8. [Contribution Guide](#contribution-guide)
-
----
-
-## Project Overview
-Mint PDF works **100% offline** and requires **zero external cloud calls, API keys, or online models**. It utilizes a local rule-based structural scanner and compiler built on ReportLab to typeset professional documents automatically.
-
----
-
-## Project Structure
+## 📦 Project Structure
 ```
 mint-pdf/
 │
-├── main.py               # Application startup & bootstrapper
-├── cli.py                # Command-line interface & guided workflows (using Rich)
+├── main.py               # Startup bootstrapper
+├── cli.py                # Console interfaces, wizard flow, and progress bars
 ├── config.py             # Configuration controller (migrations, backup & recovery)
-├── settings.py           # Configuration schema definitions (validated via Pydantic)
-├── pdf_engine.py         # Main PDF compiler & layout compositor (using ReportLab)
-├── cover_page.py         # Front cover flowables generator
-├── formatter.py          # Document structure parsing (lists, tables, blockquotes)
-├── template_manager.py   # Layout templates manager (supports template inheritance)
-├── theme_manager.py      # Theme palettes controller (supports custom JSON themes)
-├── font_manager.py       # Font catalog (manages custom TTFs and default fallbacks)
-├── document_analyzer.py  # Rule-based scanner (element counts and recommendations)
-├── toc.py                # Dot-leader Table of Contents generator
-├── metadata.py           # Pydantic model for document properties
-├── file_manager.py       # Safe OS-independent filesystem utilities
-├── utils.py              # Dimension conversions and utility helpers
-├── logger.py             # Rotating file logs and error trace managers
-│
-├── config.json           # Active app configuration settings (auto-generated)
-├── templates/            # Directory for custom template JSONs
-├── themes/               # Directory for custom theme JSONs
-├── fonts/                # Directory for user-installed custom TTFs
-├── assets/               # Folder for document media assets (e.g. images)
-├── icons/                # Folder for application icons
-├── output/               # Default output directory for generated PDFs
-├── logs/                 # Location of the debug file: logs/mint_pdf.log
-│
-├── README.md             # This document
-└── requirements.txt      # Python dependencies manifest
+├── settings.py           # Configuration schema definitions (Pydantic validated)
+├── pdf_engine.py         # Main PDF compiler & canvas composer (using ReportLab)
+├── cover_page.py         # Front cover layout generator
+├── formatter.py          # Document structure parsing (lists, tables, code blocks)
+├── template_manager.py   # Layout templates manager (inheritance resolver)
+├── theme_manager.py      # Theme palettes controller
+├── font_manager.py       # Font registry & safe PostScript mapping
+├── document_analyzer.py  # Rule-based structure analyzer
+├── toc.py                # Table of Contents generator
+├── metadata.py           # Document metadata schema
+├── file_manager.py       # OS-independent file IO helper
+├── utils.py              # Page conversions and helper utils
+└── logger.py             # Rotating file logs & error trace managers
 ```
 
 ---
 
-## Installation Guide
+## 🛠️ Installation Guide
 
 ### Prerequisites
-- Python 3.12 or newer installed on your local computer.
-- pip package manager.
+- **Python 3.12** or newer installed.
+- **pip** package manager.
 
-### Steps
-1. Navigate to the directory containing Mint PDF:
+### Setup Steps
+1. Navigate to the project directory:
    ```bash
    cd "mint-pdf"
    ```
@@ -74,99 +64,73 @@ mint-pdf/
    ```bash
    pip install -r requirements.txt
    ```
-3. Run the application:
+3. Boot the application:
    ```bash
    python main.py
    ```
 
 ---
 
-## Usage Guide
+## 📖 Usage Wizard Flow
 
-1. **Setup Wizard**: On the very first run, Mint PDF asks for a default output directory. If left blank, it defaults to:
-   `C:\Users\<CurrentUser>\Documents\Mint PDF\` (Windows).
-2. **Create New PDF (Option 1)**:
-   - **Step 1**: Choose whether to paste text or load a file (`.txt`, `.md`, `.docx`).
-   - **Step 2**: The analyzer will display document statistics (lists, tables, images, code blocks) and recommend styles.
-   - **Step 3**: Fill in document metadata (Title, Author, Organization, Version).
-   - **Step 4**: Select a template layout (e.g. Standard, Executive, Thesis).
-   - **Step 5**: Choose a visual color theme (e.g. Professional, Forest, Ocean).
-   - **Step 6**: Pick a typography font family.
-   - **Step 7**: Configure/fine-tune margins, page sizes, and numbering.
-   - **Step 8**: Enable or disable the Cover Page.
-   - **Step 9-11**: Review the pre-generation summary table.
-   - **Step 12**: Confirm file name, handle name collision prompts, and generate the PDF.
-3. **Open Existing Project (Option 2)**: Lists and summarizes previous output files found in the output directory.
-4. **Settings Configuration (Option 4)**: Dynamically adjust default themes, margin sizes, A4/Letter dimensions, and default languages.
+1. **Setup Output**: On startup, configure your default PDF export directory.
+2. **Accept Text**: Paste text block directly or load files (`.txt`, `.md`, `.docx`).
+3. **Analyze**: The engine runs parsing diagnostics and recommends themes and layout configurations.
+4. **Style Select**: Confirm template layout (Standard, Executive, Thesis) and visual theme (Professional, Forest, Ocean).
+5. **Metadata**: Enter Title, Author, and Subject properties (injected into the native PDF headers).
+6. **Compile**: A multi-stage Rich progress bar tracks generation and handles file name collisions.
 
 ---
 
-## Configuration Guide
-The application settings are saved in `config.json` and validated strictly via `Pydantic` models:
-- **`config_version`**: Schema validation version (used for automated migrations).
-- **`output_dir`**: The folder where generated files are saved.
-- **`theme`**: Active default theme choice (e.g. `Professional`, `Minimal`).
-- **`default_template`**: Default layout choice.
-- **`default_font`**: Typography choice (Times New Roman, Helvetica, Inter).
-- **`page_size`**: Dimensions choice (`LETTER`, `A4`, `LEGAL`).
-- **`margins`**: Sub-object specifying `top`, `bottom`, `left`, and `right` margins in points (pt).
-- **`auto_toc`**: Boolean flag to enable dynamic index compilations.
-- **`auto_page_numbers`**: Boolean flag to enable footer numbering.
-
-*Recovery Mechanism*: If `config.json` becomes corrupted, the manager backs it up under a timestamp and regenerates a clean settings profile.
+## ⚙️ Configuration Schema
+Active settings are saved in `config.json` and validated via Pydantic:
+- `config_version`: Migrations tracking schema version.
+- `output_dir`: Path to save compiled PDF files.
+- `theme`: Primary default visual palette (e.g. `Professional`, `Forest`).
+- `default_font`: Typography family (e.g. `Helvetica`, `Times New Roman`, `Inter`).
+- `page_size`: Standard page sizes (`LETTER`, `A4`, `LEGAL`).
+- `margins`: Top, bottom, left, right margins in points.
+- `auto_toc`: Automatically generate document tables of contents.
+- `auto_page_numbers`: Dynamic page numbering printed on canvas footers.
 
 ---
 
-## Template & Theme Guide
+## 🎨 Theme & Template Customs
 
-### 1. Custom Themes
-You can add custom color palettes by placing a `.json` file inside the `themes/` directory:
+### Custom JSON Themes
+Add custom color schemes by dropping `.json` files in the `themes/` directory:
 ```json
 {
-  "name": "Custom Gold",
-  "primary": "#D4AF37",
-  "secondary": "#AA7C11",
-  "accent": "#F3E5AB",
-  "text": "#2C3E50",
+  "name": "Mint Green",
+  "primary": "#38A169",
+  "secondary": "#2F855A",
+  "accent": "#48BB78",
+  "text": "#2D3748",
   "bg": "#FFFFFF",
-  "border": "#BDC3C7",
-  "table_row_alt": "#FAF9F6",
-  "link_color": "#D4AF37"
+  "border": "#E2E8F0",
+  "table_row_alt": "#F0FFF4",
+  "link_color": "#38A169"
 }
 ```
 
-### 2. Custom Templates & Inheritance
-You can create custom templates by dropping `.json` files inside the `templates/` directory. Templates support inheritance through the `extends` keyword. Fields not specified in the child template are recursively inherited from the parent template:
+### Custom Templates (Inheritance)
+Drop custom template layouts in `templates/` using `"extends"` to inherit properties:
 ```json
 {
-  "name": "Fancy Draft",
+  "name": "Leaflet",
   "extends": "Standard",
-  "category": "Custom",
-  "description": "Customized margins and font sizes",
+  "category": "Compact",
+  "description": "Slimmer layout margins",
   "margins": {
-    "left": 72.0,
-    "right": 72.0
-  },
-  "typography": {
-    "body_font_size": 12.0
+    "left": 36.0,
+    "right": 36.0
   }
 }
 ```
 
 ---
 
-## Developer Guide
-
-### Key Module Workflows
-- **`logger.py`**: Initializes rotating system logs in `logs/mint_pdf.log`. Standard output tracebacks are masked to prevent terminal clutter.
-- **`document_analyzer.py`**: Runs Setext underline and ATX regex counts. Computes element densities and maps them to layout categories using a heuristic score matrix.
-- **`formatter.py`**: Iterates original lines. It captures indents to format multi-level bulleted lists, wraps table cell data inside `Paragraph` flowables for text wrapping, and maps code blocks to grid panels.
-- **`pdf_engine.py`**: Renders cover sheets, TOC flows, and body flowables, calling `NumberedCanvas` to draw headers and running footers on a two-pass render.
-
----
-
-## Contribution Guide
-1. **Clean Code**: Follow PEP 8 guidelines. All public functions must have docstrings and type hints.
-2. **Error Handling**: Never output raw tracebacks directly to standard output. Use `logger.log_exception` to route traces to file logs.
-3. **Immutability**: Maintain immutability patterns. Return new copies of configuration profiles rather than mutating them.
-4. **Backward Compatibility**: Ensure schema changes increment the `config_version` and include appropriate defaults.
+## 🤝 Contribution Guidelines
+1. **PEP 8**: Follow Python PEP 8 formatting rules. Add type hints and detailed docstrings to all new methods.
+2. **Error Safety**: Mask console output stack trace warnings. Always call `logger.log_exception` to preserve complete debug logs inside `logs/mint_pdf.log`.
+3. **Immutability**: Avoid mutating state configs. Always instantiate and return updated schema copies.
