@@ -8,14 +8,13 @@ version = "1.0.0"
 description = "AI-Free Professional PDF Generator for the Terminal"
 readme = "README.md"
 requires-python = ">=3.12"
-license = { text = "MIT" }
+license = "MIT"
 authors = [
     { name = "Antigravity" }
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Environment :: Console",
     "Intended Audience :: Developers",

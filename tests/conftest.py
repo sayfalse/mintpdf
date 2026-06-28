@@ -1,4 +1,3 @@
-
 import pytest
 
 from mintpdf.settings import AppSettings, MarginsSettings

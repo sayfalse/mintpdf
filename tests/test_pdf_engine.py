@@ -1,4 +1,3 @@
-
 from mintpdf.metadata import DocumentMetadata
 from mintpdf.pdf_engine import generate_pdf
 

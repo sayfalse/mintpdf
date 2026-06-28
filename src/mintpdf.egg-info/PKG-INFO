@@ -3,12 +3,11 @@ Name: mintpdf
 Version: 1.0.0
 Summary: AI-Free Professional PDF Generator for the Terminal
 Author: Antigravity
-License: MIT
+License-Expression: MIT
 Project-URL: Homepage, https://github.com/sayfalse/mintpdf
 Project-URL: Repository, https://github.com/sayfalse/mintpdf
 Classifier: Programming Language :: Python :: 3
 Classifier: Programming Language :: Python :: 3.12
-Classifier: License :: OSI Approved :: MIT License
 Classifier: Operating System :: OS Independent
 Classifier: Environment :: Console
 Classifier: Intended Audience :: Developers

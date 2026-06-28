@@ -23,8 +23,10 @@ def main() -> None:
         clear_screen()
 
         # Step 1: Handle first-launch configuration setup
-        from .settings import AppSettings
         from typing import Optional
+
+        from .settings import AppSettings
+
         settings: Optional[AppSettings] = None
 
         if is_first_launch():
