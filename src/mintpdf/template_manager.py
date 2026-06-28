@@ -27,18 +27,23 @@ class Template:
         self.category = category
         self.extends = extends
         
-        # Default layout values if not supplied
-        self.margins = margins or {
-            "top": 54.0, "bottom": 54.0, "left": 54.0, "right": 54.0
-        }
-        self.typography = typography or {
-            "body_font_size": 10.5, "body_leading": 15.0
-        }
-        self.heading_styles = heading_styles or {
-            "h1_size": 20.0, "h1_leading": 24.0,
-            "h2_size": 15.0, "h2_leading": 19.0,
-            "h3_size": 12.0, "h3_leading": 16.0
-        }
+        # Default layout values if not supplied (and not extending another template)
+        if extends:
+            self.margins = margins
+            self.typography = typography
+            self.heading_styles = heading_styles
+        else:
+            self.margins = margins or {
+                "top": 54.0, "bottom": 54.0, "left": 54.0, "right": 54.0
+            }
+            self.typography = typography or {
+                "body_font_size": 10.5, "body_leading": 15.0
+            }
+            self.heading_styles = heading_styles or {
+                "h1_size": 20.0, "h1_leading": 24.0,
+                "h2_size": 15.0, "h2_leading": 19.0,
+                "h3_size": 12.0, "h3_leading": 16.0
+            }
 
     def to_dict(self) -> Dict[str, Any]:
         return {

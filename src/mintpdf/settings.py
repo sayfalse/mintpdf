@@ -161,12 +161,16 @@ class AppSettings(BaseModel):
                 # Merge sub-dictionary (margins)
                 if isinstance(default_val, dict) and isinstance(data[key], dict):
                     sub_merged = {**default_val}
+                    from pydantic import ValidationError
                     for sub_key, sub_default in default_val.items():
                         if sub_key in data[key]:
                             try:
-                                # Cast to type of default to check type compatibility
-                                sub_merged[sub_key] = type(sub_default)(data[key][sub_key])
-                            except (ValueError, TypeError):
+                                casted = type(sub_default)(data[key][sub_key])
+                                # Validate this field using a temporary dict
+                                test_dict = {**default_val, sub_key: casted}
+                                MarginsSettings(**test_dict)
+                                sub_merged[sub_key] = casted
+                            except (ValidationError, ValueError, TypeError):
                                 pass # Keep default
                     merged[key] = sub_merged
                 else:
