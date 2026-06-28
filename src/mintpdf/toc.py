@@ -9,7 +9,7 @@ from reportlab.platypus import Paragraph, Spacer, PageBreak # type: ignore
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle # type: ignore
 from reportlab.lib.colors import HexColor # type: ignore
 
-from theme_manager import Theme
+from .theme_manager import Theme
 
 class TOCManager:
     """Manages TOC parsing and compilation of the Table of Contents section."""

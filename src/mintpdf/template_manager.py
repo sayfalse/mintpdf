@@ -6,7 +6,7 @@ Defines layout templates, handles custom JSON templates loading, and implements 
 import json
 from typing import List, Dict, Any, Optional
 from pathlib import Path
-from logger import logger
+from .logger import logger
 
 TEMPLATES_DIR = Path("templates")
 

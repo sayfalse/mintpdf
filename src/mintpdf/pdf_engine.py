@@ -12,15 +12,15 @@ from reportlab.lib.pagesizes import letter, A4, legal # type: ignore
 from reportlab.platypus import SimpleDocTemplate, Flowable, PageBreak, Spacer, Paragraph # type: ignore
 from reportlab.lib.colors import HexColor # type: ignore
 
-from metadata import DocumentMetadata
-from settings import AppSettings
-from theme_manager import ThemeManager
-from template_manager import TemplateManager
-from font_manager import FontManager
-from formatter import format_text_to_flowables
-from cover_page import create_cover_page
-from toc import TOCManager
-from logger import logger
+from .metadata import DocumentMetadata
+from .settings import AppSettings
+from .theme_manager import ThemeManager
+from .template_manager import TemplateManager
+from .font_manager import FontManager
+from .formatter import format_text_to_flowables
+from .cover_page import create_cover_page
+from .toc import TOCManager
+from .logger import logger
 
 
 class BookmarkFlowable(Flowable):

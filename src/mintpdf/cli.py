@@ -19,25 +19,25 @@ from rich.text import Text
 from rich.columns import Columns
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn # type: ignore
 
-from settings import AppSettings, MarginsSettings
-from config import save_config, get_default_output_dir
-from logger import logger, log_exception
+from .settings import AppSettings, MarginsSettings
+from .config import save_config, get_default_output_dir
+from .logger import logger, log_exception
 
 # Modules imports
-from template_manager import TemplateManager, Template
-from theme_manager import ThemeManager, Theme
-from font_manager import FontManager
-from metadata import DocumentMetadata
-from document_analyzer import DocumentAnalyzer, AnalysisResult
-from file_manager import (
+from .template_manager import TemplateManager, Template
+from .theme_manager import ThemeManager, Theme
+from .font_manager import FontManager
+from .metadata import DocumentMetadata
+from .document_analyzer import DocumentAnalyzer, AnalysisResult
+from .file_manager import (
     ensure_directory_exists,
     list_supported_files,
     read_document,
     generate_auto_name
 )
-from pdf_engine import generate_pdf
-from toc import TOCManager
-from utils import clear_screen
+from .pdf_engine import generate_pdf
+from .toc import TOCManager
+from .utils import clear_screen
 
 # Global Console Instance
 console = Console()

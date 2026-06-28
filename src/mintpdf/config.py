@@ -13,8 +13,8 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Prompt
 
-from settings import AppSettings
-from logger import logger
+from .settings import AppSettings
+from .logger import logger
 
 CONFIG_FILE = Path("config.json")
 

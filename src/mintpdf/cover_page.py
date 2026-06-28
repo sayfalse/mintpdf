@@ -8,8 +8,8 @@ from reportlab.platypus import Paragraph, Spacer, PageBreak, Table, TableStyle #
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle # type: ignore
 from reportlab.lib.colors import HexColor # type: ignore
 
-from metadata import DocumentMetadata
-from theme_manager import Theme
+from .metadata import DocumentMetadata
+from .theme_manager import Theme
 
 def create_cover_page(metadata: DocumentMetadata, theme: Theme) -> List[Any]:
     """

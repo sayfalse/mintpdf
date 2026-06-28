@@ -4,11 +4,11 @@ Main Entry Point.
 """
 
 import sys
-from logger import logger
-from config import is_first_launch, load_config, run_setup_wizard
-from cli import MintCLI
-from font_manager import FontManager
-from utils import clear_screen
+from .logger import logger
+from .config import is_first_launch, load_config, run_setup_wizard
+from .cli import MintCLI
+from .font_manager import FontManager
+from .utils import clear_screen
 
 def main() -> None:
     """

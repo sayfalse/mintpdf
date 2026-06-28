@@ -7,7 +7,7 @@ and recommends document styling templates, themes, fonts, and filenames.
 import re
 from typing import Dict, Any, List, Optional
 from pathlib import Path
-from logger import logger
+from .logger import logger
 
 class AnalysisResult:
     """Stores the structural statistics and layout recommendations for an analyzed document."""

@@ -15,10 +15,10 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle # type: ign
 from reportlab.lib.colors import HexColor # type: ignore
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT # type: ignore
 
-from theme_manager import Theme
-from template_manager import Template
-from font_manager import FontManager
-from logger import logger
+from .theme_manager import Theme
+from .template_manager import Template
+from .font_manager import FontManager
+from .logger import logger
 
 def convert_markdown_inline(text: str) -> str:
     """

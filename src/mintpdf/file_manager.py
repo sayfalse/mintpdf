@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import List, Optional
 from docx import Document # type: ignore
 
-from logger import logger
+from .logger import logger
 
 # Supported file extensions for document input
 SUPPORTED_EXTENSIONS = {".txt", ".md", ".docx"}

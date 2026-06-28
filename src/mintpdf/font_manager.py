@@ -8,7 +8,7 @@ from pathlib import Path
 from reportlab.pdfbase import pdfmetrics # type: ignore
 from reportlab.pdfbase.ttfonts import TTFont # type: ignore
 
-from logger import logger
+from .logger import logger
 
 FONTS_DIR = Path("fonts")
 

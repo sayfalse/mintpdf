@@ -6,7 +6,7 @@ Defines color palettes and visual styles, and dynamically loads custom themes fr
 import json
 from typing import Dict, List, Any, Optional
 from pathlib import Path
-from logger import logger
+from .logger import logger
 
 THEMES_DIR = Path("themes")
 
