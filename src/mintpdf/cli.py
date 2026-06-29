@@ -24,22 +24,24 @@ from rich.prompt import Confirm, Prompt
 from rich.table import Table
 from rich.text import Text
 
-from .config import save_config
-from .document_analyzer import DocumentAnalyzer
 from .file_manager import (
     ensure_directory_exists,
     generate_auto_name,
     read_document,
 )
-from .font_manager import FontManager
 from .logger import log_exception, logger
-from .metadata import DocumentMetadata
-from .pdf_engine import generate_pdf
+from .services import (
+    ConfigurationService,
+    CoverPageService,
+    DocumentAnalysisService,
+    ExportService,
+    FontService,
+    MetadataService,
+    TemplateService,
+    ThemeService,
+    TOCService,
+)
 from .settings import AppSettings, FontEnum, MarginsSettings, PageSizeEnum, ThemeEnum
-
-# Modules imports
-from .template_manager import TemplateManager
-from .theme_manager import ThemeManager
 from .utils import clear_screen
 
 # Global Console Instance
@@ -67,8 +69,29 @@ class NavigationExit(Exception):
 class MintCLI:
     """High-fidelity CLI handler for the Mint PDF terminal application."""
 
-    def __init__(self, settings: AppSettings):
+    def __init__(
+        self,
+        settings: AppSettings,
+        config_service: ConfigurationService,
+        theme_service: ThemeService,
+        template_service: TemplateService,
+        font_service: FontService,
+        analysis_service: DocumentAnalysisService,
+        metadata_service: MetadataService,
+        cover_page_service: CoverPageService,
+        toc_service: TOCService,
+        export_service: ExportService,
+    ):
         self.settings = settings
+        self.config_service = config_service
+        self.theme_service = theme_service
+        self.template_service = template_service
+        self.font_service = font_service
+        self.analysis_service = analysis_service
+        self.metadata_service = metadata_service
+        self.cover_page_service = cover_page_service
+        self.toc_service = toc_service
+        self.export_service = export_service
 
     def _prompt(
         self,
@@ -315,7 +338,7 @@ class MintCLI:
             )
         )
         with console.status("[bold blue]Analyzing document structure offline...[/bold blue]"):
-            analysis = DocumentAnalyzer.analyze(content, orig_filename)
+            analysis = self.analysis_service.analyze(content, orig_filename)
             time.sleep(0.5)  # subtle timing for visual comfort
 
         # Print analyzer results
@@ -376,7 +399,7 @@ class MintCLI:
             self.create_new_pdf_flow()
             return
 
-        metadata = DocumentMetadata(
+        metadata = self.metadata_service.create_metadata(
             title=title,
             subtitle=subtitle if subtitle else None,
             author=author if author else None,
@@ -395,7 +418,7 @@ class MintCLI:
                 expand=False,
             )
         )
-        templates = TemplateManager.get_all_templates()
+        templates = self.template_service.get_all_templates()
 
         # Display templates in standard columns
         t_table = Table(title="Available Templates", show_lines=True)
@@ -408,14 +431,14 @@ class MintCLI:
             t_table.add_row(str(idx + 1), t.name, t.category, t.description)
         console.print(t_table)
 
-        template_names = TemplateManager.get_template_names()
+        template_names = self.template_service.get_template_names()
         try:
             tmpl_choice = self._prompt(
                 "Choose layout template",
                 default=analysis.recommended_template,
                 choices=template_names,
             )
-            selected_template = TemplateManager.get_template(tmpl_choice)
+            selected_template = self.template_service.get_template(tmpl_choice)
         except NavigationBack:
             self.create_new_pdf_flow()
             return
@@ -429,7 +452,7 @@ class MintCLI:
                 expand=False,
             )
         )
-        themes = ThemeManager.get_all_theme_names()
+        themes = self.theme_service.get_all_theme_names()
 
         th_table = Table(title="Available Themes", show_lines=True)
         th_table.add_column("Name", style="cyan bold")
@@ -438,7 +461,7 @@ class MintCLI:
         th_table.add_column("Accent Color", style="white")
 
         for name in themes:
-            th = ThemeManager.get_theme(name)
+            th = self.theme_service.get_theme(name)
             th_table.add_row(
                 name,
                 f"[{th.primary}]{th.primary}[/]",
@@ -451,7 +474,7 @@ class MintCLI:
             theme_choice = self._prompt(
                 "Choose visual theme", default=analysis.recommended_theme, choices=themes
             )
-            selected_theme = ThemeManager.get_theme(theme_choice)
+            selected_theme = self.theme_service.get_theme(theme_choice)
         except NavigationBack:
             self.create_new_pdf_flow()
             return
@@ -465,7 +488,7 @@ class MintCLI:
                 expand=False,
             )
         )
-        fonts = FontManager.get_supported_fonts()
+        fonts = self.font_service.get_supported_fonts()
         for idx, fn in enumerate(fonts):
             console.print(f"  [green]{idx+1:2d}.[/green] {fn}")
         try:
@@ -688,7 +711,9 @@ class MintCLI:
             progress.update(t3, completed=100)
 
             t4 = progress.add_task("Compiling PDF flowables...", total=100)
-            success = generate_pdf(content, final_path, metadata, doc_settings, has_cover=has_cover)
+            success = self.export_service.export_to_pdf(
+                content, final_path, metadata, doc_settings, has_cover=has_cover
+            )
             progress.update(t4, completed=100)
 
         if success:
@@ -768,7 +793,7 @@ class MintCLI:
         table.add_column("Category", style="cyan", width=15)
         table.add_column("Description", style="white")
 
-        for t in TemplateManager.get_all_templates():
+        for t in self.template_service.get_all_templates():
             table.add_row(t.name, t.category, t.description)
 
         console.print(table)
@@ -814,7 +839,7 @@ class MintCLI:
                 choice = self._prompt("Select option to modify (or 'b' to return)", default="b")
 
                 if choice == "b":
-                    save_config(self.settings)
+                    self.config_service.save_config(self.settings)
                     break
 
                 if choice == "1":
@@ -828,14 +853,14 @@ class MintCLI:
                         self._wait_for_key()
 
                 elif choice == "2":
-                    themes = ThemeManager.get_all_theme_names()
+                    themes = self.theme_service.get_all_theme_names()
                     val = self._prompt(
                         "Enter Default Theme", default=self.settings.theme.value, choices=themes
                     )
                     self.settings.theme = ThemeEnum(val)
 
                 elif choice == "3":
-                    templates = TemplateManager.get_template_names()
+                    templates = self.template_service.get_template_names()
                     val = self._prompt(
                         "Enter Default Template",
                         default=self.settings.default_template,
@@ -844,7 +869,7 @@ class MintCLI:
                     self.settings.default_template = val
 
                 elif choice == "4":
-                    fonts = FontManager.get_supported_fonts()
+                    fonts = self.font_service.get_supported_fonts()
                     val = self._prompt(
                         "Enter Default Font",
                         default=self.settings.default_font.value,
@@ -900,10 +925,10 @@ class MintCLI:
                     self.settings.auto_page_numbers = bool_val
 
                 # Save immediately upon every modification
-                save_config(self.settings)
+                self.config_service.save_config(self.settings)
 
             except NavigationBack:
-                save_config(self.settings)
+                self.config_service.save_config(self.settings)
                 break
             except ValueError as ve:
                 self._show_error_panel(f"Validation Error: {ve}")

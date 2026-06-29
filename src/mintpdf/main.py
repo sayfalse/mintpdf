@@ -1,14 +1,20 @@
-"""
-Mint PDF - AI-Free Professional PDF Generator for the Terminal.
-Main Entry Point.
-"""
-
 import sys
+from typing import Optional
 
 from .cli import MintCLI
-from .config import is_first_launch, load_config, run_setup_wizard
-from .font_manager import FontManager
 from .logger import logger
+from .services import (
+    ConfigurationService,
+    CoverPageService,
+    DocumentAnalysisService,
+    ExportService,
+    FontService,
+    MetadataService,
+    TemplateService,
+    ThemeService,
+    TOCService,
+)
+from .settings import AppSettings
 from .utils import clear_screen
 
 
@@ -31,36 +37,54 @@ def main() -> None:
         logger.info("Application starting up...")
         clear_screen()
 
+        # Instantiate services
+        config_service = ConfigurationService()
+        theme_service = ThemeService()
+        template_service = TemplateService()
+        font_service = FontService()
+        analysis_service = DocumentAnalysisService()
+        metadata_service = MetadataService()
+        cover_page_service = CoverPageService()
+        toc_service = TOCService()
+        export_service = ExportService()
+
         # Step 1: Handle first-launch configuration setup
-        from typing import Optional
-
-        from .settings import AppSettings
-
         settings: Optional[AppSettings] = None
 
-        if is_first_launch():
+        if config_service.is_first_launch():
             logger.info("First launch detected. Running setup wizard.")
-            settings = run_setup_wizard()
+            settings = config_service.run_setup_wizard()
         else:
-            settings = load_config()
+            settings = config_service.load_config()
 
             # If config exists but is corrupted, run setup wizard
             if settings is None:
                 logger.warning(
                     "Configuration loaded as None (possible corruption). Rerunning setup wizard."
                 )
-                settings = run_setup_wizard()
+                settings = config_service.run_setup_wizard()
 
         # Step 2: Register system/custom fonts
         try:
-            FontManager.register_fonts()
+            font_service.register_fonts()
         except Exception as e:
             logger.error(f"Error registering fonts on startup: {e}")
 
         # Step 3: Run the interactive CLI Loop
         logger.info("Launching main CLI interactive loop.")
         assert settings is not None
-        cli = MintCLI(settings)
+        cli = MintCLI(
+            settings,
+            config_service,
+            theme_service,
+            template_service,
+            font_service,
+            analysis_service,
+            metadata_service,
+            cover_page_service,
+            toc_service,
+            export_service,
+        )
         cli.run()
 
     except KeyboardInterrupt:
