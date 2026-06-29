@@ -4,9 +4,12 @@ Uses Pydantic for validation, structured parsing, and default merging.
 """
 
 from enum import Enum
-from typing import Any, Dict
+from typing import TYPE_CHECKING, Any, Dict
 
 from pydantic import BaseModel, Field, field_validator
+
+if TYPE_CHECKING:
+    from .domain import Configuration
 
 
 class PageSizeEnum(str, Enum):
@@ -135,6 +138,45 @@ class AppSettings(BaseModel):
         data["default_font"] = self.default_font.value
         data["page_size"] = self.page_size.value
         return data
+
+    def to_domain(self) -> "Configuration":
+        from .domain import Configuration as DomainConfig
+
+        return DomainConfig(
+            output_dir=self.output_dir,
+            theme=self.theme.value,
+            default_template=self.default_template,
+            default_font=self.default_font.value,
+            page_size=self.page_size.value,
+            margins={
+                "top": self.margins.top,
+                "bottom": self.margins.bottom,
+                "left": self.margins.left,
+                "right": self.margins.right,
+            },
+            language=self.language,
+            auto_toc=self.auto_toc,
+            auto_page_numbers=self.auto_page_numbers,
+        )
+
+    @classmethod
+    def from_domain(cls, domain: "Configuration") -> "AppSettings":
+        return cls(
+            output_dir=domain.output_dir,
+            theme=ThemeEnum(domain.theme),
+            default_template=domain.default_template,
+            default_font=FontEnum(domain.default_font),
+            page_size=PageSizeEnum(domain.page_size),
+            margins=MarginsSettings(
+                top=domain.margins.get("top", 54.0),
+                bottom=domain.margins.get("bottom", 54.0),
+                left=domain.margins.get("left", 54.0),
+                right=domain.margins.get("right", 54.0),
+            ),
+            language=domain.language,
+            auto_toc=domain.auto_toc,
+            auto_page_numbers=domain.auto_page_numbers,
+        )
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "AppSettings":

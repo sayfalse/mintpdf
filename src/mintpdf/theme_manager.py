@@ -4,42 +4,25 @@ Defines color palettes and visual styles, and dynamically loads custom themes fr
 """
 
 import json
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
+from .domain.models import Theme as DomainTheme
 from .logger import logger
 
 THEMES_DIR = Path("themes")
 
 
-class Theme:
+@dataclass
+class Theme(DomainTheme):
     """Represents a document styling theme with specific color hex values."""
 
-    def __init__(
-        self,
-        name: str,
-        primary: str,
-        secondary: str,
-        accent: str,
-        text: str,
-        bg: str = "#FFFFFF",
-        border: str = "#E2E8F0",
-        table_header_bg: Optional[str] = None,
-        table_row_alt: str = "#F7FAFC",
-        link_color: str = "#3182CE",
-    ):
-        self.name = name
-        self.primary = primary
-        self.secondary = secondary
-        self.accent = accent
-        self.text = text
-        self.bg = bg
-        self.border = border
-        self.table_header_bg = table_header_bg if table_header_bg else primary
-        self.table_row_alt = table_row_alt
-        self.link_color = link_color
+    def __post_init__(self) -> None:
+        if not self.table_header_bg:
+            self.table_header_bg = self.primary
 
-    def to_dict(self) -> Dict[str, str]:
+    def to_dict(self) -> Dict[str, Any]:
         return {
             "name": self.name,
             "primary": self.primary,
