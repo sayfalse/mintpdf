@@ -280,6 +280,29 @@ class AppSettings(BaseModel):
             else:
                 merged[key] = default_val
 
+        # Apply environment overrides
+        import os
+
+        env_mappings = {
+            "MINT_OUTPUT_DIR": "output_dir",
+            "MINT_THEME": "theme",
+            "MINT_DEFAULT_TEMPLATE": "default_template",
+            "MINT_DEFAULT_FONT": "default_font",
+            "MINT_PAGE_SIZE": "page_size",
+            "MINT_LANGUAGE": "language",
+            "MINT_AUTO_TOC": "auto_toc",
+            "MINT_AUTO_PAGE_NUMBERS": "auto_page_numbers",
+        }
+        for env_var, key in env_mappings.items():
+            if env_var in os.environ:
+                val = os.environ[env_var]
+                if val.lower() in ("true", "1", "yes"):
+                    merged[key] = True
+                elif val.lower() in ("false", "0", "no"):
+                    merged[key] = False
+                else:
+                    merged[key] = val
+
         try:
             return cls(**merged)
         except Exception:

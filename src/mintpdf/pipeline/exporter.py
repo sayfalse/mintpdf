@@ -87,6 +87,9 @@ class PDFExporter:
             # Build PDF
             doc.build(final_flowables, canvasmaker=NumberedCanvas)
             logger.info("PDF document built successfully via pipeline exporter.")
+            from ..event_dispatcher import EventDispatcher
+
+            EventDispatcher().publish("pdf:compiled", output_path=output_path)
             return True
         except Exception as e:
             logger.error(f"Error in pipeline PDF exporter: {e}", exc_info=True)

@@ -144,7 +144,11 @@ class DocumentBuilder:
         if current_section.title or current_section.elements:
             sections.append(current_section)
 
-        return Document(metadata=metadata, sections=sections)
+        document = Document(metadata=metadata, sections=sections)
+        from ..event_dispatcher import EventDispatcher
+
+        EventDispatcher().publish("document:parsed", document=document)
+        return document
 
     def _parse_table(self, table_lines: List[str]) -> Tuple[List[str], List[List[str]]]:
         headers: List[str] = []
