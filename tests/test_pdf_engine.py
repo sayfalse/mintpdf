@@ -10,8 +10,8 @@ def test_generate_pdf_end_to_end(mock_settings, tmp_path):
     )
 
     output_file = tmp_path / "test_doc.pdf"
-    content = """# Verification Heading
-This is some verification body copy.
+    content = """### Verification Heading 3
+This is some verification body copy starting with H3 (testing level clamping).
 """
     success = generate_pdf(
         text=content,

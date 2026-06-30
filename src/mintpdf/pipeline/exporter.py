@@ -70,18 +70,25 @@ class PDFExporter:
 
             # We inject BookmarkFlowables immediately before headings in flowables
             final_flowables = []
+            current_max_level = -1
             for flowable in flowables:
                 if isinstance(flowable, RLParagraph) and flowable.style.name in [
                     "MintH1",
                     "MintH2",
                     "MintH3",
                 ]:
-                    level = 0
+                    target_level = 0
                     if flowable.style.name == "MintH2":
-                        level = 1
+                        target_level = 1
                     elif flowable.style.name == "MintH3":
-                        level = 2
-                    final_flowables.append(BookmarkFlowable(flowable.text, level))
+                        target_level = 2
+
+                    # Clamp outline level to prevent jumping levels (e.g. from -1 to 2, or 0 to 2)
+                    if target_level > current_max_level + 1:
+                        target_level = current_max_level + 1
+
+                    current_max_level = target_level
+                    final_flowables.append(BookmarkFlowable(flowable.text, target_level))
                 final_flowables.append(flowable)
 
             # Build PDF

@@ -207,19 +207,26 @@ def generate_pdf(
 
         # We inject BookmarkFlowables immediately before headings
         final_body = []
+        current_max_level = -1
         for flowable in body_flowables:
             if isinstance(flowable, Paragraph) and flowable.style.name in [
                 "MintH1",
                 "MintH2",
                 "MintH3",
             ]:
-                level = 0
+                target_level = 0
                 if flowable.style.name == "MintH2":
-                    level = 1
+                    target_level = 1
                 elif flowable.style.name == "MintH3":
-                    level = 2
+                    target_level = 2
+
+                # Clamp outline level to prevent jumping levels (e.g. from -1 to 2, or 0 to 2)
+                if target_level > current_max_level + 1:
+                    target_level = current_max_level + 1
+
+                current_max_level = target_level
                 # Prepend the outline bookmark
-                final_body.append(BookmarkFlowable(flowable.text, level))
+                final_body.append(BookmarkFlowable(flowable.text, target_level))
             final_body.append(flowable)
 
         story.extend(final_body)
