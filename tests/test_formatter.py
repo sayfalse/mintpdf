@@ -16,6 +16,13 @@ def test_convert_markdown_inline():
     link_result = convert_markdown_inline(link_text)
     assert '<a href="https://github.com" color="#3182CE"><u>Github</u></a>' in link_result
 
+    # Test snake_case variables in inline code (underscores should not be parsed as italics)
+    snake_text = "Edit `config.json` to set defaults (e.g., `output_dir`, `page_size`)."
+    snake_result = convert_markdown_inline(snake_text)
+    assert "<i>" not in snake_result
+    assert "output_dir" in snake_result
+    assert "page_size" in snake_result
+
 
 def test_format_text_to_flowables_table(mock_theme, mock_template):
     table_markdown = """

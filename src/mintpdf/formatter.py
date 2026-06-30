@@ -40,7 +40,7 @@ def convert_markdown_inline(text: str) -> str:
 
     # 3. Italic: *text* or _text_
     text = re.sub(r"\*(.*?)\*", r"<i>\1</i>", text)
-    text = re.sub(r"_(.*?)_", r"<i>\1</i>", text)
+    text = re.sub(r"(?<!\w)_(?!\s)([^_]+?)(?<!\s)_(?!\w)", r"<i>\1</i>", text)
 
     # 4. Inline code: `code` (rendered in courier font)
     text = re.sub(r"`(.*?)`", r'<font face="Courier" color="#805AD5"><b>\1</b></font>', text)
