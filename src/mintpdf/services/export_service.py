@@ -87,7 +87,23 @@ class ExportService:
         )
         story.extend(body_flowables)
 
-        # 4. Export -> file path
+        # 4. Check for exporter plugin
+        fmt = output_path.suffix.lower().lstrip(".")
+        from ..plugins.manager import PluginManager
+
+        pm = PluginManager()
+        pm.discover_and_load()
+        if fmt in pm.exporters:
+            return pm.exporters[fmt].export(
+                story,
+                output_path,
+                document,
+                settings,
+                theme,
+                has_cover=has_cover,
+            )
+
+        # Default PDF Exporter
         return self.exporter.export(
             story,
             output_path,
