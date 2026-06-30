@@ -39,3 +39,17 @@ def test_from_dict_with_defaults():
     assert s2.default_font == FontEnum.LATO  # resolved case-insensitively
     assert s2.margins.left == 54.0  # fell back to default due to invalid value
     assert s2.margins.top == 40.0  # successfully merged
+
+
+def test_enum_from_str():
+    assert FontEnum.from_str("roboto") == FontEnum.ROBOTO
+    assert FontEnum.from_str("Times New Roman") == FontEnum.TIMES_NEW_ROMAN
+    assert ThemeEnum.from_str("forest") == ThemeEnum.FOREST
+    assert PageSizeEnum.from_str("a4") == PageSizeEnum.A4
+
+    with pytest.raises(ValueError):
+        FontEnum.from_str("invalid_font")
+    with pytest.raises(ValueError):
+        ThemeEnum.from_str("invalid_theme")
+    with pytest.raises(ValueError):
+        PageSizeEnum.from_str("invalid_page_size")

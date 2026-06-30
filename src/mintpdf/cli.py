@@ -512,9 +512,9 @@ class MintCLI:
         # Load from template configurations
         doc_settings = AppSettings(
             output_dir=self.settings.output_dir,
-            theme=ThemeEnum(selected_theme.name),
+            theme=ThemeEnum.from_str(selected_theme.name),
             default_template=selected_template.name,
-            default_font=FontEnum(font_choice),
+            default_font=FontEnum.from_str(font_choice),
             page_size=self.settings.page_size,
             margins=MarginsSettings(**(selected_template.margins or {})),
             language=self.settings.language,
@@ -544,7 +544,7 @@ class MintCLI:
                     default=doc_settings.page_size.value,
                     choices=["LETTER", "A4", "LEGAL"],
                 )
-                doc_settings.page_size = PageSizeEnum(page_sz.upper())
+                doc_settings.page_size = PageSizeEnum.from_str(page_sz)
 
                 top_m = float(
                     self._prompt("Top margin (pt)", default=str(doc_settings.margins.top))
@@ -857,7 +857,7 @@ class MintCLI:
                     val = self._prompt(
                         "Enter Default Theme", default=self.settings.theme.value, choices=themes
                     )
-                    self.settings.theme = ThemeEnum(val)
+                    self.settings.theme = ThemeEnum.from_str(val)
 
                 elif choice == "3":
                     templates = self.template_service.get_template_names()
@@ -875,7 +875,7 @@ class MintCLI:
                         default=self.settings.default_font.value,
                         choices=fonts,
                     )
-                    self.settings.default_font = FontEnum(val)
+                    self.settings.default_font = FontEnum.from_str(val)
 
                 elif choice == "5":
                     val = self._prompt(
@@ -883,7 +883,7 @@ class MintCLI:
                         default=self.settings.page_size.value,
                         choices=["LETTER", "A4", "LEGAL"],
                     )
-                    self.settings.page_size = PageSizeEnum(val.upper())
+                    self.settings.page_size = PageSizeEnum.from_str(val)
 
                 elif choice == "6":
                     top = float(

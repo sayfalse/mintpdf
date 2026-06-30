@@ -19,6 +19,15 @@ class PageSizeEnum(str, Enum):
     A3 = "A3"
     A5 = "A5"
 
+    @classmethod
+    def from_str(cls, value: str) -> "PageSizeEnum":
+        """Resolve page size case-insensitively."""
+        val_upper = value.strip().upper()
+        for enum_val in cls:
+            if enum_val.value == val_upper:
+                return enum_val
+        raise ValueError(f"'{value}' is not a valid PageSizeEnum")
+
 
 class ThemeEnum(str, Enum):
     BLUE = "Blue"
@@ -32,6 +41,15 @@ class ThemeEnum(str, Enum):
     PROFESSIONAL = "Professional"
     MINIMAL = "Minimal"
 
+    @classmethod
+    def from_str(cls, value: str) -> "ThemeEnum":
+        """Resolve theme name case-insensitively."""
+        val_lower = value.strip().lower()
+        for enum_val in cls:
+            if enum_val.value.lower() == val_lower:
+                return enum_val
+        raise ValueError(f"'{value}' is not a valid ThemeEnum")
+
 
 class FontEnum(str, Enum):
     TIMES_NEW_ROMAN = "Times New Roman"
@@ -44,6 +62,15 @@ class FontEnum(str, Enum):
     OPEN_SANS = "Open Sans"
     LATO = "Lato"
     INTER = "Inter"
+
+    @classmethod
+    def from_str(cls, value: str) -> "FontEnum":
+        """Resolve font family case-insensitively."""
+        val_lower = value.strip().lower()
+        for enum_val in cls:
+            if enum_val.value.lower() == val_lower:
+                return enum_val
+        raise ValueError(f"'{value}' is not a valid FontEnum")
 
 
 class MarginsSettings(BaseModel):
@@ -102,10 +129,10 @@ class AppSettings(BaseModel):
     def validate_theme_before(cls, value: Any) -> Any:
         """Resolve theme case-insensitively to its matching Enum value."""
         if isinstance(value, str):
-            val_lower = value.strip().lower()
-            for enum_val in ThemeEnum:
-                if enum_val.value.lower() == val_lower:
-                    return enum_val
+            try:
+                return ThemeEnum.from_str(value)
+            except ValueError:
+                pass
         return value
 
     @field_validator("default_font", mode="before")
@@ -113,10 +140,10 @@ class AppSettings(BaseModel):
     def validate_font_before(cls, value: Any) -> Any:
         """Resolve font family case-insensitively to its matching Enum value."""
         if isinstance(value, str):
-            val_lower = value.strip().lower()
-            for enum_val in FontEnum:
-                if enum_val.value.lower() == val_lower:
-                    return enum_val
+            try:
+                return FontEnum.from_str(value)
+            except ValueError:
+                pass
         return value
 
     @field_validator("page_size", mode="before")
@@ -124,10 +151,10 @@ class AppSettings(BaseModel):
     def validate_page_size_before(cls, value: Any) -> Any:
         """Resolve page size case-insensitively to its matching Enum value."""
         if isinstance(value, str):
-            val_upper = value.strip().upper()
-            for enum_val in PageSizeEnum:
-                if enum_val.value == val_upper:
-                    return enum_val
+            try:
+                return PageSizeEnum.from_str(value)
+            except ValueError:
+                pass
         return value
 
     def to_dict(self) -> Dict[str, Any]:

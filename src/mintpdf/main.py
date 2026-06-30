@@ -37,6 +37,21 @@ def main() -> None:
         logger.info("Application starting up...")
         clear_screen()
 
+        # Instantiate pipeline stages
+        from .pipeline import (
+            DocumentBuilder,
+            DocumentLoader,
+            LayoutBuilder,
+            PDFExporter,
+            Renderer,
+        )
+
+        loader = DocumentLoader()
+        builder = DocumentBuilder()
+        layout_builder = LayoutBuilder()
+        renderer = Renderer()
+        exporter = PDFExporter()
+
         # Instantiate services
         config_service = ConfigurationService()
         theme_service = ThemeService()
@@ -46,7 +61,13 @@ def main() -> None:
         metadata_service = MetadataService()
         cover_page_service = CoverPageService()
         toc_service = TOCService()
-        export_service = ExportService()
+        export_service = ExportService(
+            document_loader=loader,
+            document_builder=builder,
+            layout_builder=layout_builder,
+            renderer=renderer,
+            exporter=exporter,
+        )
 
         # Step 1: Handle first-launch configuration setup
         settings: Optional[AppSettings] = None
